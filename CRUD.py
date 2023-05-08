@@ -7,6 +7,7 @@ Created on Sun Oct 16 14:01:54 2022
 
 from flask import Flask ,jsonify , request ,Response
 import json
+import pandas
 
 import pymongo
 from bson.objectid import ObjectId
@@ -87,7 +88,6 @@ def get_user_by_address(add):
     return Response(
         response = json.dumps(re)
         )
-    return 
 
 
 ###########################################
@@ -201,6 +201,18 @@ def aggregate_users_country(key):
                                              "min":{"$min":"$age"},
                                              "avg":{"$avg":"$age"}}
                                         }]))
+    return json.dumps(dbResponse)
+
+
+@app.route("/test" , methods = ['GET'])
+def test():
+    mycol = mydb['Users']
+    #.sort("age",-1)
+    # dbResponse = list(mycol.find({},{"firstname":1,"age":1 , "_id" :0}).sort(
+    #     [("age" , -1) , ("firstname" , 1)]))
+    dbResponse = list(mycol.find({"firstname":{"$regex":"^a"}}))
+    for user in dbResponse:
+        user['_id'] = str(user['_id'])
     return json.dumps(dbResponse)
 
 if __name__ == "__main__":
